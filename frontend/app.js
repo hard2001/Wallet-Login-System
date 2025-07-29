@@ -20,7 +20,7 @@ loginBtn.onclick = async () => {
     const address = accounts[0];
     statusEl.textContent = 'Wallet connected: ' + address;
 
-    const { data } = await axios.post('http://localhost:3000/request-nonce', {
+    const { data } = await axios.post('https://wallet-login-system.onrender.com/request-nonce', {
       address,
     });
     const message = `Login nonce: ${data.nonce}`;
@@ -30,7 +30,7 @@ loginBtn.onclick = async () => {
       params: [message, address],
     });
 
-    const response = await axios.post('http://localhost:3000/verify', {
+    const response = await axios.post('https://wallet-login-system.onrender.com/verify', {
       address,
       signature,
     });
