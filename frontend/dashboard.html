@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wallet Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <header>
+      <h1 class="title">💳 Wallet Dashboard</h1>
+      <button id="profileBtn" class="btn neon">View Profile</button>
+      <button id="logoutBtn" class="btn glass">Logout</button>
+    </header>
+
+    <main>
+      <div class="card">
+        <h2>Your Wallet</h2>
+        <p id="walletAddress">Address: Loading...</p>
+        <p id="walletBalance">Balance: Loading...</p>
+      </div>
+
+      <div class="card">
+        <h2>Ethereum Price</h2>
+        <p id="ethPrice">Loading...</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
