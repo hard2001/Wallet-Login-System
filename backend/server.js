@@ -8,6 +8,8 @@ const axios = require('axios');
 
 const app = express();
 const web3 = new Web3();
+const local_url = 'http://localhost:3000';
+console.log('🚀 ~ file: server.js:12 ~ local_url:', local_url);
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -123,4 +125,49 @@ app.get('/gas-fee', verifyToken, async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log('Server running on https://wallet-login-system.onrender.com'));
+
+const fs = require('fs');
+
+// Path to store the JSON file
+const mintedTokensFile = path.join(__dirname, 'mintedTokens.json');
+
+// Helper: Load existing token data
+const loadMintedTokens = () => {
+  if (!fs.existsSync(mintedTokensFile)) return {};
+  const data = fs.readFileSync(mintedTokensFile);
+  return JSON.parse(data);
+};
+
+// Helper: Save token data
+const saveMintedTokens = (data) => {
+  fs.writeFileSync(mintedTokensFile, JSON.stringify(data, null, 2));
+};
+
+// POST /save-minted-token
+app.post('/save-minted-token', verifyToken, (req, res) => {
+  const { address } = req.user; // decoded from JWT
+  const { tokenId, uri } = req.body;
+
+  if (!tokenId || !uri) {
+    return res.status(400).json({ error: 'tokenId and uri are required' });
+  }
+
+  const tokens = loadMintedTokens();
+  const lowerAddr = address.toLowerCase();
+
+  if (!tokens[lowerAddr]) {
+    tokens[lowerAddr] = [];
+  }
+
+  tokens[lowerAddr].push({
+    tokenId,
+    uri,
+    mintedAt: new Date().toISOString(),
+  });
+
+  saveMintedTokens(tokens);
+  res.json({ success: true, message: 'Token saved successfully' });
+});
+
+
+app.listen(3000, () => console.log(`Server running on ${local_url}`));

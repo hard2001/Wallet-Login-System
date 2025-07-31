@@ -537,101 +537,58 @@ const contractABI = [
     type: 'function',
   },
 ];
-const walletAddressEl = document.getElementById('walletAddress');
-const walletBalanceEl = document.getElementById('walletBalance');
-const ethPriceEl = document.getElementById('ethPrice');
-const logoutBtn = document.getElementById('logoutBtn');
 
-const authToken = localStorage.getItem('authToken');
-const walletAddress = localStorage.getItem('walletAddress');
-
-if (!authToken) {
-  window.location.href = 'index.html'; // Redirect to login if not authenticated
-}
-
-// Fetch wallet balance
-async function fetchWalletData() {
-  try {
-    walletAddressEl.textContent = `Address: ${walletAddress}`;
-
-    // Fetch ETH balance
-    const web3 = new Web3(window.ethereum);
-    const balanceWei = await web3.eth.getBalance(walletAddress);
-    const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
-    walletBalanceEl.textContent = `Balance: ${parseFloat(balanceEth).toFixed(
-      4
-    )} ETH`;
-
-    // Fetch ETH price from CoinGecko
-    const { data } = await axios.get(
-      'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
-    );
-    ethPriceEl.textContent = `1 ETH = $${data.ethereum.usd}`;
-  } catch (error) {
-    console.error('Error fetching wallet data:', error);
+async function loadMyNFTs() {
+  if (typeof window.ethereum === 'undefined') {
+    alert('MetaMask not found!');
+    return;
   }
-}
 
-async function mintNFT() {
+  const web3 = new Web3(window.ethereum);
+  await ethereum.request({ method: 'eth_requestAccounts' });
+  const accounts = await web3.eth.getAccounts();
+  const userAccount = accounts[0];
+
+  const nftList = document.getElementById('nftList');
+  const loading = document.getElementById('loading');
+  loading.innerText = 'Fetching your NFTs...';
+
+  const contract = new web3.eth.Contract(contractABI, contractAddress);
+
   try {
-    const web3 = new Web3(window.ethereum);
-    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    const balance = await contract.methods.balanceOf(userAccount).call();
+    if (balance == 0) {
+      loading.innerText = "You don't own any NFTs from this contract.";
+      return;
+    }
 
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const userAddress = accounts[0];
-    const tokenId = Date.now();
+    loading.remove(); // Remove loading text if NFTs found
 
-    const tx = await contract.methods.safeMint(userAddress, tokenId).send({ from: userAddress });
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await contract.methods
+        .tokenOfOwnerByIndex(userAccount, i)
+        .call();
+      const tokenURI = await contract.methods.tokenURI(tokenId).call();
 
-    await fetch('http://localhost:3000/save-minted-token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tokenId }),
-    });
+      const response = await fetch(tokenURI);
+      const metadata = await response.json();
 
-    showToast(`✅ NFT Minted! TX Hash: ${tx.transactionHash}`, 'success');
+      const nftCard = document.createElement('div');
+      nftCard.className = 'bg-gray-800 rounded-lg p-4 shadow-md';
+
+      nftCard.innerHTML = `
+        <img src="${metadata.image}" alt="NFT Image" class="rounded w-full h-48 object-cover mb-4">
+        <h2 class="text-xl font-semibold text-cyan-300 mb-1">${metadata.name}</h2>
+        <p class="text-gray-300 text-sm">${metadata.description}</p>
+        <p class="text-xs text-gray-500 mt-2">Token ID: ${tokenId}</p>
+      `;
+
+      nftList.appendChild(nftCard);
+    }
   } catch (err) {
-    console.error('Minting failed:', err);
-    showToast(`❌ Minting failed`, 'error');
+    loading.innerText = 'Error loading NFTs.';
+    console.error(err);
   }
 }
 
-
-function showToast(message, type = 'success') {
-  Toastify({
-    text: message,
-    duration: 4000,
-    close: true,
-    gravity: "top", // top or bottom
-    position: "right", // left, center or right
-    backgroundColor:
-      type === 'success' ? "linear-gradient(to right, #00b09b, #96c93d)" :
-      "linear-gradient(to right, #ff5f6d, #ffc371)",
-    stopOnFocus: true,
-  }).showToast();
-}
-
-
-fetchWalletData();
-
-// Logout
-logoutBtn.onclick = () => {
-  localStorage.clear();
-  window.location.href = 'index.html';
-};
-
-const profileBtn = document.getElementById('profileBtn');
-profileBtn.onclick = () => {
-  window.location.href = 'profile.html';
-};
-
-
-const mintBtn = document.getElementById('mintBtn');
-mintBtn.onclick = mintNFT;
-
-
-myNFTBtn.onclick = () => {
-  window.location.href = 'mynft.html';
-};
+window.addEventListener('DOMContentLoaded', loadMyNFTs);
