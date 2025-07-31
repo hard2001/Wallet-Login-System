@@ -23,27 +23,40 @@ async function loadProfile() {
     walletBalanceEl.textContent = `${parseFloat(balanceEth).toFixed(4)} ETH`;
 
     // Fetch Recent Transactions from Etherscan (dummy if API not available)
-    const etherscanApiKey = "YC71TGWE9QAHYH46G5FW257K6CIHJJZ2A6"; // Replace with your Etherscan key
+    const etherscanApiKey = 'YC71TGWE9QAHYH46G5FW257K6CIHJJZ2A6'; // Replace with your Etherscan key
     const { data } = await axios.get(
-      `https://api.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${etherscanApiKey}`
+      `https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=desc&apikey=${etherscanApiKey}`
     );
 
-    transactionsEl.innerHTML = "";
+    console.log('🚀 ~ file: profile.js:28 ~ data:', data);
+    transactionsEl.innerHTML = '';
 
     if (data.result && data.result.length > 0) {
       const recentTxs = data.result.slice(0, 5); // Last 5 transactions
-      recentTxs.forEach(tx => {
-        const li = document.createElement('li');
-        li.textContent = `Hash: ${tx.hash.slice(0, 10)}... | Value: ${web3.utils.fromWei(tx.value, 'ether')} ETH`;
-        transactionsEl.appendChild(li);
+      const transactionsEl = document.getElementById('transactions');
+      transactionsEl.innerHTML = ''; // Clear loading
+
+      recentTxs.forEach((tx) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-4 py-2"><a href="http://sepolia.etherscan.io/tx/${
+            tx.hash
+          }" target="_blank" style="color: #00f2ff">${tx.hash.slice(
+          0,
+          15
+        )}...</a></td>
+          <td class="px-4 py-2">${tx.from.slice(0, 15)}...</td>
+          <td class="px-4 py-2">${tx.to.slice(0, 15)}...</td>
+          <td class="px-4 py-2">${web3.utils.fromWei(tx.value, 'ether')}</td>
+        `;
+        transactionsEl.appendChild(row);
       });
     } else {
-      transactionsEl.innerHTML = "<li>No recent transactions found.</li>";
+      transactionsEl.innerHTML = '<li>No recent transactions found.</li>';
     }
-
   } catch (error) {
     console.error('Error loading profile:', error);
-    transactionsEl.innerHTML = "<li>Unable to fetch transactions.</li>";
+    transactionsEl.innerHTML = '<li>Unable to fetch transactions.</li>';
   }
 }
 

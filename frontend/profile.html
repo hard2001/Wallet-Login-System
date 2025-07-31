@@ -15,24 +15,36 @@
       <button id="logoutBtn" class="btn glass">Logout</button>
     </header>
 
-    <main>
-      <div class="card">
-        <h2>Wallet Address</h2>
-        <p id="walletAddress">Loading...</p>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 max-w-7xl mx-auto w-full">
+      <main class="flex flex-col gap-6">
+        <div class="card">
+          <h2>Wallet Address</h2>
+          <p id="walletAddress">Loading...</p>
+        </div>
 
-      <div class="card">
-        <h2>Token Balances</h2>
-        <p id="walletBalance">Loading...</p>
-      </div>
+        <div class="card">
+          <h2>Token Balances</h2>
+          <p id="walletBalance">Loading...</p>
+        </div>
+      </main>
 
-      <div class="card">
+      <div class="card md:col-span-2 overflow-auto">
         <h2>Recent Transactions</h2>
-        <ul id="transactions">
-          <li>Loading...</li>
-        </ul>
+        <table class="w-full table-auto text-sm text-left border-collapse mt-4" style="width : 100%">
+          <thead>
+            <tr>
+              <th class="px-4 py-2 border-b border-white/10">Hash</th>
+              <th class="px-4 py-2 border-b border-white/10">From</th>
+              <th class="px-4 py-2 border-b border-white/10">To</th>
+              <th class="px-4 py-2 border-b border-white/10">Value (ETH)</th>
+            </tr>
+          </thead>
+          <tbody id="transactions">
+            <tr><td colspan="4" class="px-4 py-2 text-center">Loading...</td></tr>
+          </tbody>
+        </table>
       </div>
-    </main>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
