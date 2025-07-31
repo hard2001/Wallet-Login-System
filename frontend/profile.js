@@ -32,23 +32,29 @@ async function loadProfile() {
     transactionsEl.innerHTML = '';
 
     if (data.result && data.result.length > 0) {
-      const recentTxs = data.result.slice(0, 5); // Last 5 transactions
+      const recentTxs = data.result; // Last 5 transactions
       const transactionsEl = document.getElementById('transactions');
       transactionsEl.innerHTML = ''; // Clear loading
 
       recentTxs.forEach((tx) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td class="px-4 py-2"><a href="http://sepolia.etherscan.io/tx/${
-            tx.hash
-          }" target="_blank" style="color: #00f2ff">${tx.hash.slice(
-          0,
-          15
-        )}...</a></td>
-          <td class="px-4 py-2">${tx.from.slice(0, 15)}...</td>
-          <td class="px-4 py-2">${tx.to.slice(0, 15)}...</td>
-          <td class="px-4 py-2">${web3.utils.fromWei(tx.value, 'ether')}</td>
-        `;
+    <td class="px-4 py-2">
+      <a href="https://sepolia.etherscan.io/tx/${
+        tx.hash
+      }" target="_blank" style="color: #00f2ff">
+        ${tx.hash.slice(0, 15)}...
+      </a>
+    </td>
+    <td class="px-4 py-2">${tx.from.slice(0, 15)}...</td>
+    <td class="px-4 py-2">${
+      tx.to ? tx.to.slice(0, 15) : 'Contract Creation'
+    }...</td>
+    <td class="px-4 py-2">${web3.utils.fromWei(tx.value, 'ether')}</td>
+    <td class="px-4 py-2 whitespace-nowrap">${new Date(
+      tx.timeStamp * 1000
+    ).toLocaleString()}</td>
+  `;
         transactionsEl.appendChild(row);
       });
     } else {

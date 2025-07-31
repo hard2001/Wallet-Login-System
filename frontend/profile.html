@@ -1,53 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wallet Profile</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-</head>
-<body>
-  <div class="dashboard-container">
-    <header>
-      <h1 class="title">👤 Wallet Profile</h1>
-      <button id="backBtn" class="btn glass">Back to Dashboard</button>
-      <button id="logoutBtn" class="btn glass">Logout</button>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wallet Profile</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header>
+        <h1 class="title">👤 Wallet Profile</h1>
+        <button id="backBtn" class="btn glass">Back to Dashboard</button>
+        <button id="logoutBtn" class="btn glass">Logout</button>
+      </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 max-w-7xl mx-auto w-full">
-      <main class="flex flex-col gap-6">
-        <div class="card">
-          <h2>Wallet Address</h2>
-          <p id="walletAddress">Loading...</p>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 max-w-7xl mx-auto w-full"
+      >
+        <main class="flex flex-col gap-6">
+          <div class="card">
+            <h2>Wallet Address</h2>
+            <p id="walletAddress">Loading...</p>
+          </div>
+
+          <div class="card">
+            <h2>Token Balances</h2>
+            <p id="walletBalance">Loading...</p>
+          </div>
+        </main>
+
+        <div class="card md:col-span-2">
+          <h2>Recent Transactions</h2>
+        
+          <!-- Scrollable wrapper -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full table-auto text-sm text-left border-collapse mt-4">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2 border-b border-white/10">Hash</th>
+                  <th class="px-4 py-2 border-b border-white/10">From</th>
+                  <th class="px-4 py-2 border-b border-white/10">To</th>
+                  <th class="px-4 py-2 border-b border-white/10">Value (ETH)</th>
+                  <th class="px-4 py-2 border-b border-white/10">Time</th>
+                </tr>
+              </thead>
+              <tbody id="transactions">
+                <tr><td colspan="5" class="px-4 py-2 text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-        <div class="card">
-          <h2>Token Balances</h2>
-          <p id="walletBalance">Loading...</p>
-        </div>
-      </main>
-
-      <div class="card md:col-span-2 overflow-auto">
-        <h2>Recent Transactions</h2>
-        <table class="w-full table-auto text-sm text-left border-collapse mt-4" style="width : 100%">
-          <thead>
-            <tr>
-              <th class="px-4 py-2 border-b border-white/10">Hash</th>
-              <th class="px-4 py-2 border-b border-white/10">From</th>
-              <th class="px-4 py-2 border-b border-white/10">To</th>
-              <th class="px-4 py-2 border-b border-white/10">Value (ETH)</th>
-            </tr>
-          </thead>
-          <tbody id="transactions">
-            <tr><td colspan="4" class="px-4 py-2 text-center">Loading...</td></tr>
-          </tbody>
-        </table>
+        
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="profile.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="profile.js"></script>
+  </body>
 </html>
