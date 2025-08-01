@@ -3,16 +3,6 @@
 A 3-page **Web3 Wallet Dashboard** built with **MetaMask login**, **JWT authentication**, **Ethereum wallet details**, and now **NFT Minting with file upload**.  
 This project displays wallet address, ETH balance, live Ethereum price, recent transactions, and allows users to mint NFTs with custom images via `nft.storage`.
 
----
-
-## 🔥 New Feature: NFT Minting with File Upload
-- Users can **mint NFTs directly from the dashboard**
-- NFT metadata (name, description, image) is uploaded to **IPFS** using **nft.storage**
-- The minted NFT is associated with the user’s wallet
-- Metadata is stored and retrievable via IPFS URLs
-
----
-
 ## ✅ Features
 
 - **MetaMask Wallet Login** (Web3 + `personal_sign` for secure login)
