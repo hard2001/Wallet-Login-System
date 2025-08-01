@@ -30,12 +30,12 @@
           </div>
         </main>
 
-        <div class="card md:col-span-2">
+        <div class="card scrollable-card md:col-span-2">
           <h2>Recent Transactions</h2>
-        
-          <!-- Scrollable wrapper -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full table-auto text-sm text-left border-collapse mt-4">
+          <div class="overflow-x-auto w-full">
+            <table
+              class="min-w-[800px] table-auto text-sm text-left border-collapse mt-4"
+            >
               <thead>
                 <tr>
                   <th class="px-4 py-2 border-b border-white/10">Hash</th>
@@ -46,7 +46,9 @@
                 </tr>
               </thead>
               <tbody id="transactions">
-                <tr><td colspan="5" class="px-4 py-2 text-center">Loading...</td></tr>
+                <tr>
+                  <td colspan="5" class="px-4 py-2 text-center">Loading...</td>
+                </tr>
               </tbody>
             </table>
           </div>

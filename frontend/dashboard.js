@@ -582,7 +582,7 @@ async function fetchGasFee() {
     }
 
     const response = await axios.get(
-      'http://localhost:3000/gas-fee?currency=gwei',
+      'https://wallet-login-system.onrender.com/gas-fee?currency=gwei',
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -611,7 +611,7 @@ async function mintNFT() {
       .safeMint(userAddress, tokenId)
       .send({ from: userAddress });
 
-    await fetch('http://localhost:3000/save-minted-token', {
+    await fetch('https://wallet-login-system.onrender.com/save-minted-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -632,7 +632,7 @@ async function fetchMyNFTs() {
   if (!token) return alert('Please log in');
 
   try {
-    const res = await fetch('http://localhost:3000/my-nfts', {
+    const res = await fetch('https://wallet-login-system.onrender.com/my-nfts', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -670,7 +670,7 @@ async function loadMyNFTs() {
   loading.innerText = 'Fetching your NFTs...';
 
   try {
-    const res = await fetch('http://localhost:3000/my-nfts', {
+    const res = await fetch('https://wallet-login-system.onrender.com/my-nfts', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

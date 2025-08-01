@@ -199,6 +199,22 @@ ul li {
   }
 }
 
+table {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.dashboard-container {
+  overflow-y: auto; /* allows vertical scrolling if needed */
+  overflow-x: hidden; /* still prevents horizontal scroll on the main container */
+}
+
+.card.scrollable-card {
+  max-height: 400px; /* adjust as per your row height */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .table-row-hover {
   transition: all 0.3s ease-in-out;
 }
@@ -252,3 +268,32 @@ ul li {
   margin-bottom: 12px;
 }
 
+
+
+/* Scrollbar for Chrome, Edge, Safari */
+.scrollable-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollable-card::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05); /* Matches your card bg */
+  border-radius: 10px;
+}
+
+.scrollable-card::-webkit-scrollbar-thumb {
+  background: #00f2ff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #00f2ff;
+}
+
+/* Optional: On hover, darker neon glow */
+.scrollable-card::-webkit-scrollbar-thumb:hover {
+  background: #00c0cc;
+  box-shadow: 0 0 12px #00c0cc;
+}
+
+/* Firefox support */
+.scrollable-card {
+  scrollbar-width: thin;
+  scrollbar-color: #00f2ff rgba(255, 255, 255, 0.05);
+}
