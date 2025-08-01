@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
+const fs = require('fs');
 
 const app = express();
 const web3 = new Web3();
@@ -125,18 +126,33 @@ app.get('/gas-fee', verifyToken, async (req, res) => {
   }
 });
 
+const TOKENS_FILE = path.join(__dirname, 'mintedTokens.json');
 
-const fs = require('fs');
+// Load minted tokens from JSON
+const loadMintedTokens = () => {
+  if (!fs.existsSync(TOKENS_FILE)) return {};
+  const data = fs.readFileSync(TOKENS_FILE);
+  return JSON.parse(data);
+};
+
+app.get('/my-nfts', verifyToken, (req, res) => {
+  try {
+    const address = req.user.address.toLowerCase();
+    console.log('🚀 ~ file: server.js:143 ~ address:', address);
+    const allTokens = loadMintedTokens();
+    console.log('🚀 ~ file: server.js:144 ~ allTokens:', allTokens);
+    const myTokens = allTokens[address] || [];
+    console.log('🚀 ~ file: server.js:145 ~ myTokens:', myTokens);
+
+    res.json({ nfts: myTokens });
+  } catch (err) {
+    console.error('Error reading NFTs:', err);
+    res.status(500).json({ error: 'Failed to load your NFTs' });
+  }
+});
 
 // Path to store the JSON file
 const mintedTokensFile = path.join(__dirname, 'mintedTokens.json');
-
-// Helper: Load existing token data
-const loadMintedTokens = () => {
-  if (!fs.existsSync(mintedTokensFile)) return {};
-  const data = fs.readFileSync(mintedTokensFile);
-  return JSON.parse(data);
-};
 
 // Helper: Save token data
 const saveMintedTokens = (data) => {
@@ -155,6 +171,12 @@ app.post('/save-minted-token', verifyToken, (req, res) => {
   const tokens = loadMintedTokens();
   const lowerAddr = address.toLowerCase();
 
+  if (tokens[lowerAddr].some((t) => t.tokenId === tokenId)) {
+    return res
+      .status(409)
+      .json({ error: 'Token ID already exists for this user' });
+  }
+
   if (!tokens[lowerAddr]) {
     tokens[lowerAddr] = [];
   }
@@ -168,6 +190,5 @@ app.post('/save-minted-token', verifyToken, (req, res) => {
   saveMintedTokens(tokens);
   res.json({ success: true, message: 'Token saved successfully' });
 });
-
 
 app.listen(3000, () => console.log(`Server running on ${local_url}`));
