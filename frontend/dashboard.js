@@ -760,7 +760,8 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchGasFee();
 
   mintBtn?.addEventListener('click', () => {
-    document.getElementById('mintForm').classList.remove('hidden');
+    const mintForm = document.getElementById('mintForm');
+    mintForm.classList.toggle('hidden');
   });
 
   document.getElementById('submitMintBtn')?.addEventListener('click', mintNFT);

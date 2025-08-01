@@ -49,12 +49,31 @@
         </div>
 
         <!-- Mint NFT Input Form -->
-        <div id="mintForm" class="card hidden">
-          <h2>Mint New NFT</h2>
-          <input type="text" id="nftName" placeholder="NFT Name" class="input" />
-          <input type="text" id="nftDescription" placeholder="NFT Description" class="input" />
-          <input type="file" id="nftImage" accept="image/*" class="input" />
-          <button id="submitMintBtn" class="btn neon">Submit NFT</button>
+        <div
+          id="mintForm"
+          class="card neon-glass hidden"
+          style="transition: all 0.3s ease"
+        >
+          <h2 class="text-cyan-300 text-lg mb-2">🎨 Mint New NFT</h2>
+          <input
+            type="text"
+            id="nftName"
+            placeholder="NFT Name"
+            class="input mb-2 p-2 rounded bg-gray-700 text-white"
+          />
+          <input
+            type="text"
+            id="nftDescription"
+            placeholder="NFT Description"
+            class="input mb-2 p-2 rounded bg-gray-700 text-white"
+          />
+          <input
+            type="file"
+            id="nftImage"
+            accept="image/*"
+            class="input mb-4 p-2 rounded bg-gray-700 text-white"
+          />
+          <button id="submitMintBtn" class="btn neon">🚀 Submit NFT</button>
         </div>
 
         <div id="loader" class="loader-mint hidden">⏳ Minting NFT...</div>
@@ -62,7 +81,10 @@
         <section id="nftSection" class="card hidden">
           <h2 class="text-xl text-cyan-200 mb-2">🖼️ My NFTs</h2>
           <div id="loading" class="text-gray-400 mb-4">Loading...</div>
-          <div id="nftList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+          <div
+            id="nftList"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+          ></div>
         </section>
       </main>
     </div>
