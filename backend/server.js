@@ -6,6 +6,10 @@ const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
 const fs = require('fs');
+const { NFTStorage, File } = require('nft.storage');
+const client = new NFTStorage({
+  token: 'b73d047d.60346d46c7f448b584488df8dcb24ed3',
+});
 
 const app = express();
 const web3 = new Web3();
@@ -190,5 +194,44 @@ app.post('/save-minted-token', verifyToken, (req, res) => {
   saveMintedTokens(tokens);
   res.json({ success: true, message: 'Token saved successfully' });
 });
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // temp folder
+
+app.post(
+  '/upload-nft',
+  verifyToken,
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const { name, description } = req.body;
+      const imagePath = req.file?.path;
+
+      if (!name || !description || !imagePath) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const imageBuffer = await fs.promises.readFile(imagePath);
+      console.log("🚀 ~ file: server.js:215 ~ imageBuffer:", imageBuffer)
+      const metadata = await client.store({
+        name,
+        description,
+        image: new File([imageBuffer], req.file.originalname, {
+          type: req.file.mimetype,
+        }),
+      });
+      
+      console.log("🚀 ~ file: server.js:217 ~ metadata:", metadata)
+      // Clean up local file
+      fs.unlinkSync(imagePath);
+
+      const tokenURI = metadata.url;
+      res.json({ tokenURI });
+    } catch (err) {
+      console.error('Error uploading NFT:', err);
+      res.status(500).json({ error: 'Failed to upload NFT metadata' });
+    }
+  }
+);
 
 app.listen(3000, () => console.log(`Server running on ${local_url}`));

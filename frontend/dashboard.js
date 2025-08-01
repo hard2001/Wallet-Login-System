@@ -537,32 +537,32 @@ const contractABI = [
     type: 'function',
   },
 ];
+
+
+// Cleaned-up and corrected script for NFT minting dashboard
+
 const walletAddressEl = document.getElementById('walletAddress');
 const walletBalanceEl = document.getElementById('walletBalance');
 const ethPriceEl = document.getElementById('ethPrice');
 const logoutBtn = document.getElementById('logoutBtn');
+const profileBtn = document.getElementById('profileBtn');
+const mintBtn = document.getElementById('mintBtn');
+const myNFTBtn = document.getElementById('myNFTBtn');
 
 const authToken = localStorage.getItem('authToken');
 const walletAddress = localStorage.getItem('walletAddress');
 
-if (!authToken) {
-  window.location.href = 'index.html'; // Redirect to login if not authenticated
-}
+if (!authToken) window.location.href = 'index.html';
 
-// Fetch wallet balance
 async function fetchWalletData() {
   try {
     walletAddressEl.textContent = `Address: ${walletAddress}`;
 
-    // Fetch ETH balance
     const web3 = new Web3(window.ethereum);
     const balanceWei = await web3.eth.getBalance(walletAddress);
     const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
-    walletBalanceEl.textContent = `Balance: ${parseFloat(balanceEth).toFixed(
-      4
-    )} ETH`;
+    walletBalanceEl.textContent = `Balance: ${parseFloat(balanceEth).toFixed(4)} ETH`;
 
-    // Fetch ETH price from CoinGecko
     const { data } = await axios.get(
       'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'
     );
@@ -575,12 +575,10 @@ async function fetchWalletData() {
 async function fetchGasFee() {
   try {
     const token = localStorage.getItem('authToken');
-    console.log('🚀 ~ file: dashboard.js:578 ~ token:', token);
     if (!token) {
       document.getElementById('gasFee').textContent = 'Login required';
       return;
     }
-
     const response = await axios.get(
       'http://localhost:3000/gas-fee?currency=gwei',
       {
@@ -589,7 +587,6 @@ async function fetchGasFee() {
         },
       }
     );
-
     const { gasPrice, currency } = response.data;
     document.getElementById('gasFee').textContent = `${gasPrice} ${currency}`;
   } catch (error) {
@@ -651,8 +648,8 @@ function showToast(message, type = 'success') {
     text: message,
     duration: 4000,
     close: true,
-    gravity: 'top', // top or bottom
-    position: 'right', // left, center or right
+    gravity: 'top',
+    position: 'right',
     backgroundColor:
       type === 'success'
         ? 'linear-gradient(to right, #00b09b, #96c93d)'
@@ -675,8 +672,6 @@ async function loadMyNFTs() {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("🚀 ~ file: dashboard.js:674 ~ res:", res)
-
     const data = await res.json();
     nftList.innerHTML = '';
     loading.remove();
@@ -693,14 +688,12 @@ async function loadMyNFTs() {
 
       const nftCard = document.createElement('div');
       nftCard.className = 'bg-gray-800 rounded-lg p-4 shadow-md';
-
       nftCard.innerHTML = `
         <img src="${metadata.image}" alt="NFT Image" class="rounded w-full h-48 object-cover mb-4">
         <h2 class="text-xl font-semibold text-cyan-300 mb-1">${metadata.name}</h2>
         <p class="text-gray-300 text-sm">${metadata.description}</p>
         <p class="text-xs text-gray-500 mt-2">Token ID: ${nft.tokenId}</p>
       `;
-
       nftList.appendChild(nftCard);
     }
   } catch (err) {
@@ -709,74 +702,82 @@ async function loadMyNFTs() {
   }
 }
 
+async function mintNFT() {
+  const name = document.getElementById('nftName').value.trim();
+  console.log("🚀 ~ file: dashboard.js:653 ~ name:", name)
+  const description = document.getElementById('nftDescription').value.trim();
+  const image = document.getElementById('nftImage').files[0];
+  const loader = document.getElementById('loader');
 
-fetchWalletData();
+  if (!name || !description || !image) {
+    Toastify({ text: 'Please fill in all NFT details', style: { background: '#f00' } }).showToast();
+    return;
+  }
 
-// Logout
-logoutBtn.onclick = () => {
-  localStorage.clear();
-  window.location.href = 'index.html';
-};
+  loader.classList.remove('hidden');
 
-const profileBtn = document.getElementById('profileBtn');
-profileBtn.onclick = () => {
-  window.location.href = 'profile.html';
-};
+  try {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('image', image);
 
-const mintBtn = document.getElementById('mintBtn');
-mintBtn.onclick = mintNFT;
+    const uploadRes = await axios.post(
+      'http://localhost:3000/upload-nft',
+      formData,
+      { headers: { Authorization: `Bearer ${authToken}` } }
+    );
 
-// myNFTBtn.onclick = () => {
-//   window.location.href = 'mynft.html';
-// };
+    console.log("🚀 ~ file: dashboard.js:677 ~ uploadRes:", uploadRes?.data)
+    const { tokenURI } = uploadRes.data;
+    const web3 = new Web3(window.ethereum);
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const userAddress = accounts[0];
+    const tokenId = Date.now();
 
-window.addEventListener('DOMContentLoaded', () => {
+    const contract = new web3.eth.Contract(contractABI, contractAddress);
+    console.log("🚀 ~ file: dashboard.js:684 ~ contract:", contract)
+    await contract.methods.safeMint(userAddress, tokenId).send({ from: userAddress });
+
+    await axios.post(
+      'http://localhost:3000/save-minted-token',
+      { tokenId, uri: tokenURI },
+      { headers: { Authorization: `Bearer ${authToken}` } }
+    );
+
+    Toastify({ text: '🎉 NFT Minted Successfully!', style: { background: 'green' } }).showToast();
+    window.location.href = 'mynft.html';
+  } catch (err) {
+    console.error('Error minting NFT:', err);
+    Toastify({ text: 'Error minting NFT', style: { background: '#f00' } }).showToast();
+  } finally {
+    loader.classList.add('hidden');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchWalletData();
   fetchGasFee();
+
+  mintBtn?.addEventListener('click', () => {
+    document.getElementById('mintForm').classList.remove('hidden');
+  });
+
+  document.getElementById('submitMintBtn')?.addEventListener('click', mintNFT);
+
+  myNFTBtn?.addEventListener('click', () => {
+    document.getElementById('nftSection').classList.remove('hidden');
+    document.getElementById('nftList').innerHTML = '';
+    document.getElementById('loading').innerText = 'Loading...';
+    loadMyNFTs();
+  });
+
+  profileBtn?.addEventListener('click', () => {
+    window.location.href = 'profile.html';
+  });
+
+  logoutBtn?.addEventListener('click', () => {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  });
 });
-
-
-document.getElementById('myNFTBtn').addEventListener('click', () => {
-  document.getElementById('nftSection').classList.remove('hidden');
-  document.getElementById('nftList').innerHTML = '';
-  document.getElementById('loading').innerText = 'Loading...';
-  loadMyNFTs();
-});
-
-
-// document.getElementById('myNFTBtn').addEventListener('click', async () => {
-//   const token = localStorage.getItem('authToken');
-//   if (!token) return alert('Please login first.');
-
-//   try {
-//     const res = await fetch('http://localhost:3000/my-nfts', {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-
-//     const data = await res.json();
-//     const container = document.getElementById('nftContainer');
-//     const nftList = document.getElementById('nftList');
-//     container.innerHTML = ''; // Clear old entries
-//     nftList.style.display = 'block';
-
-//     if (data.nfts.length === 0) {
-//       container.innerHTML = '<p>You have not minted any NFTs yet.</p>';
-//       return;
-//     }
-
-//     data.nfts.forEach(nft => {
-//       const card = document.createElement('div');
-//       card.className = 'nft-card';
-//       card.innerHTML = `
-//         <img src="${nft.uri.replace('ipfs://', 'https://ipfs.io/ipfs/')}" alt="NFT ${nft.tokenId}" />
-//         <p>🆔 Token ID: ${nft.tokenId}</p>
-//         <p>🕓 Minted: ${new Date(nft.mintedAt).toLocaleString()}</p>
-//       `;
-//       container.appendChild(card);
-//     });
-//   } catch (err) {
-//     console.error('Error fetching NFTs:', err);
-//     showToast("Failed to load NFTs", 'error');
-//   }
-// });
