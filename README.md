@@ -13,8 +13,6 @@ This project displays wallet address, ETH balance, live Ethereum price, recent t
   - Live ETH Price (via CoinGecko API)
 - **Recent Transactions** (via Etherscan API)
 - **NFT Minting Flow**:
-  - Image + metadata form
-  - Uploads to IPFS using `nft.storage`
   - Calls `safeMint` on Ethereum smart contract
 - **Pages**:
   1. `index.html` – Wallet Login
